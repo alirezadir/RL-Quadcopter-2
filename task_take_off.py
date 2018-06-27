@@ -23,14 +23,41 @@ class Task():
         self.action_high = 900
         self.action_size = 4
 
+
         # Goal
         self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.]) 
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        #reward = 1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
         # reward = np.exp(-0.0001*abs(self.sim.pose[:3]- self.target_pos).sum())
-        reward = np.tanh(1 - 0.003*(abs(self.sim.pose[:3] - self.target_pos))).sum()
+        # reward_z = (-0.0001*abs(self.sim.pose[2]- self.target_pos[2]).sum())
+        # reward_xy = (-0.0003*abs(self.sim.pose[:2]- self.target_pos[:2]).sum())
+        # reward = np.exp(reward_xy + reward_z)
+
+        # position_score = 10.-.3*np.linalg.norm(self.sim.pose[:3] - self.target_pos)**2
+        # # angular_stationary_score = max(10.-.3*np.linalg.norm(self.sim.angular_v), -10)
+        # angular_stationary_score = 10.-.3*np.linalg.norm(self.sim.angular_v)**2
+        # reward = (position_score + .1*angular_stationary_score)/10.
+        # reward = np.tanh(reward)
+
+
+        # temp = abs(self.sim.pose[:3] - self.target_pos)
+        # reward = (self.sim.pose[2] - self.target_pos[2]) - 0.5 * temp[:2].sum()
+        # if self.sim.pose[2] >= self.target_pos[2]:
+        #     reward += 30.0  # bonus reward
+        # else:
+        #     reward -= 10
+        # temp = self.sim.pose - self.last_post
+        # reward += temp[2]
+
+
+
+
+        # reward = np.tanh(1 - 0.003*(abs(self.sim.pose[:3] - self.target_pos))).sum()
+        reward_z = np.tanh(1 - 0.003*(abs(self.sim.pose[2] - self.target_pos[2]))).sum()
+        reward_xy = np.tanh(1 - 0.009*(abs(self.sim.pose[:2] - self.target_pos[:2]))).sum()
+        reward = reward_z + reward_xy
+
         return reward
 
     def step(self, rotor_speeds):
